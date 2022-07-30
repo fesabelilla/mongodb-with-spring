@@ -32,7 +32,7 @@ public class RestApiMongoDbApplication {
 					"DHA82"
 			);
 
-			String email = "hasan@rokomari.com";
+			String email = "zahidH@rokomari.com";
 			Student student = new Student(
 					"Zahid",
 					"Hasan",
@@ -43,18 +43,28 @@ public class RestApiMongoDbApplication {
 					10.02,
 					LocalDateTime.now()
 			);
-
-			Query query = new Query();
-			query.addCriteria(Criteria.where("email").is(email));
-			List<Student> students = mongoTemplate.find(query, Student.class);
-
-			if (students.size() == 0) {
-				System.out.println("No data found. So insert data");
-				repository.insert(student);
-			} else {
-				System.out.println("Data found. So no need to insert data.");
-			}
+			//usingMongoTemplateAndQuery(repository, mongoTemplate, email, student);
+			repository.findStudentByEmail(email)
+					.ifPresentOrElse(s -> {
+						System.out.println("Data found. So no need to insert data.");
+					}, ()->{
+						System.out.println("No data found. So insert data");
+						repository.insert(student);
+					});
 		};
+	}
+
+	private void usingMongoTemplateAndQuery(StudentsRepository repository, MongoTemplate mongoTemplate, String email, Student student) {
+		Query query = new Query();
+		query.addCriteria(Criteria.where("email").is(email));
+		List<Student> students = mongoTemplate.find(query, Student.class);
+
+		if (students.size() == 0) {
+			System.out.println("No data found. So insert data");
+			repository.insert(student);
+		} else {
+			System.out.println("Data found. So no need to insert data.");
+		}
 	}
 
 }
